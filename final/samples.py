@@ -1,5 +1,5 @@
-from util import *
 from dragonsmash import *
+from dragonsmash.util import *
 
 def tdfw(c):
     c.addLoopedNote(Note(note_to_num['E6'], 13, 8, 127), 0, 64)

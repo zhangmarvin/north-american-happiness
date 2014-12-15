@@ -260,5 +260,10 @@ note_to_num = {
     'G9': 115,
 }
 
-num_to_instrument = { instrument_to_num[k] : k for k in instrument_to_num }
-num_to_note = { note_to_num[k] : k for k in note_to_num }
+num_to_instrument = {}
+for k in instrument_to_num:
+    instrument_to_num[k] = k
+
+num_to_note = {}
+for k in note_to_num:
+    num_to_note[k] = k
