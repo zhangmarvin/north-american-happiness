@@ -3,10 +3,11 @@ from javax.sound.midi import *
 END_OF_TRACK = 47
 
 class Note(object):
-    def __init__(self, frequency, instrument, duration):
+    def __init__(self, frequency, instrument, duration, velocity):
         self.frequency = frequency
         self.instrument = instrument
         self.duration = duration
+        self.velocity = velocity
 
 class Event(object):
     def __init__(self, *args):
@@ -29,9 +30,9 @@ class SingleNoteEvent(object):
         if not self._midiEvents:
             sm = ShortMessage(ShortMessage.PROGRAM_CHANGE, 1, self.note.instrument, 0)
             instrumentChange = MidiEvent(sm, self.offset)
-            sm = ShortMessage(ShortMessage.NOTE_ON, 1, self.note.frequency, 127)
-            noteOn = MidiEvent(sm, self.offset);
-            sm = ShortMessage(ShortMessage.NOTE_OFF, 1, self.note.frequency, 127);
+            sm = ShortMessage(ShortMessage.NOTE_ON, 1, self.note.frequency, self.note.velocity)
+            noteOn = MidiEvent(sm, self.offset)
+            sm = ShortMessage(ShortMessage.NOTE_OFF, 1, self.note.frequency, self.note.velocity)
             noteOff = MidiEvent(sm, self.offset + self.note.duration)
 
             self._midiEvents = [instrumentChange, noteOn, noteOff]
@@ -143,12 +144,12 @@ connect1 = player.newConnection()
 #connect2 = player.newConnection()
 
 offset = 48
-note = Note(60,0,16)
+note = Note(60,0,16,127)
 sm = ShortMessage(ShortMessage.PROGRAM_CHANGE, 1, note.instrument, 0)
 instrumentChange = MidiEvent(sm, offset)
-sm = ShortMessage(ShortMessage.NOTE_ON, 1, note.frequency, 127)
-noteOn = MidiEvent(sm, offset);
-sm = ShortMessage(ShortMessage.NOTE_OFF, 1, note.frequency, 127);
+sm = ShortMessage(ShortMessage.NOTE_ON, 1, note.frequency, note.velocity)
+noteOn = MidiEvent(sm, offset)
+sm = ShortMessage(ShortMessage.NOTE_OFF, 1, note.frequency, note.velocity)
 noteOff = MidiEvent(sm, offset + note.duration)
 
 connect1.track.add(instrumentChange)
