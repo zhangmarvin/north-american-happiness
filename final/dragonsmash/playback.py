@@ -2,7 +2,9 @@ from javax.sound.midi import *
 
 END_OF_TRACK = 47
 
+
 class Note(object):
+
     def __init__(self, frequency, instrument, duration, velocity):
         self.frequency = frequency
         self.instrument = instrument
@@ -11,6 +13,7 @@ class Note(object):
 
 
 class SingleNoteEvent(object):
+
     def __init__(self, note, offset):
         self.note = note
         self.offset = offset
@@ -32,6 +35,7 @@ class SingleNoteEvent(object):
 
 
 class LoopedNoteEvent(object):
+
     def __init__(self, note, offset, period):
         self.note = note
         self.offset = offset
@@ -55,7 +59,9 @@ class LoopedNoteEvent(object):
 
 
 class ConnectionTrack(MetaEventListener):
+
     dummyMessage = MetaMessage(42, None, 0)
+
     def __init__(self, track, measureLength):
         self.track = track
         self.measureLength = measureLength
@@ -137,6 +143,7 @@ class ConnectionTrack(MetaEventListener):
 
 
 class Speaker(MetaEventListener):
+
     def __init__(self, ppq, measureLength):
         self.sequencer = MidiSystem.getSequencer()
         self.sequence = Sequence(Sequence.PPQ, ppq)
@@ -174,3 +181,4 @@ if __name__ == '__main__':
     s = Speaker(16, 64)
     c1 = s.newConnection()
     c2 = s.newConnection()
+

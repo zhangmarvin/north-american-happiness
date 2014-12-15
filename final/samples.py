@@ -13,3 +13,4 @@ def tdfw(c):
 s = Speaker(16, 64)
 tdfw(s.newConnection())
 s.playAll()
+

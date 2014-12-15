@@ -261,9 +261,10 @@ note_to_num = {
 }
 
 num_to_instrument = {}
-for k in instrument_to_num:
-    instrument_to_num[k] = k
+for inst, num in instrument_to_num.items():
+    num_to_instrument[num] = inst
 
 num_to_note = {}
-for k in note_to_num:
-    num_to_note[k] = k
+for note, num in note_to_num.items():
+    num_to_note[num] = note
+
