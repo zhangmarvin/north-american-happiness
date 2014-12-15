@@ -11,23 +11,40 @@ class Note(object):
 class Event(object):
     def __init__(self, *args):
         if args:
-            self.midi_events = args
+            self.midiEvents = args
         else:
-            self.midi_events = ()
+            self.midiEvents = ()
 
     def addMidiEvents(self, *event):
-        self.midi_events += event
+        self.midiEvents += event
 
-class SingleEvent(Event):
-    def __init__(self, offset, *args):
-        Event.__init__(self, *args)
+class SingleNoteEvent(object):
+    def __init__(self, note, offset):
+        self.note = note
         self.offset = offset
+        self._midiEvents = []
+
+    @property
+    def midiEvents(self):
+        if not self._midiEvents:
+            sm = ShortMessage(ShortMessage.PROGRAM_CHANGE, 1, self.note.instrument, 0)
+            instrumentChange = MidiEvent(sm, self.offset)
+            sm = ShortMessage(ShortMessage.NOTE_ON, 1, self.note.frequency, 127)
+            noteOn = MidiEvent(sm, self.offset);
+            sm = ShortMessage(ShortMessage.NOTE_OFF, 1, self.note.frequency, 127);
+            noteOff = MidiEvent(sm, self.offset + self.note.duration)
+
+            self._midiEvents = [instrumentChange, noteOn, noteOff]
+
+        return self._midiEvents
+
 
 class LoopedEvent(Event):
     def __init__(self, period, offset, *args):
         Event.__init__(self, *args)
         self.period = period
         self.offset = offset
+
 
 class ConnectionTrack(MetaEventListener):
     def __init__(self, track):
@@ -37,25 +54,19 @@ class ConnectionTrack(MetaEventListener):
         self.events = []
 
         #
-        self.looped_events = []
+        self.loopedEvents = []
 
         # for pending notes with offset > track length
         self.queue = []
 
     def addNote(self, note, offset):
+        noteEvent = SingleNoteEvent(note, offset)
 
-        sm = ShortMessage(ShortMessage.PROGRAM_CHANGE, 1, note.instrument, 0)
-        instrumentChange = MidiEvent(sm, offset)
-        sm = ShortMessage(ShortMessage.NOTE_ON, 1, note.frequency, 127)
-        noteOn = MidiEvent(sm, offset);
-        sm = ShortMessage(ShortMessage.NOTE_OFF, 1, note.frequency, 127);
-        noteOff = MidiEvent(sm, offset + note.duration)
-
-        e = SingleEvent(offset, instrumentChange, noteOn, noteOff)
-        self.addEvent(e)
-
-        return e
-
+        if offset > self.track.ticks():
+            self.queue.append(noteEvent)
+        else:
+            self.addEvent(noteEvent)
+        return noteEvent
 
     def addLoopedNote(self, note, offset, period):
         # create the events
@@ -64,26 +75,23 @@ class ConnectionTrack(MetaEventListener):
         pass
 
     def addEvent(self, event):
-        if event.offset > self.track.ticks():
-            self.queue.append(event)
-            return
-
+        # only called for current event
         if isinstance(event, LoopedEvent):
-            self.looped_events.append(event)
-        else:
+            self.loopedEvents.append(event)
+        else: # SingleNoteEvent
             self.events.append(event)
-            for e in event.midi_events:
+            for e in event.midiEvents:
                 self.track.add(e)
 
-    def deleteNote(self, note):
-        if note in self.events:
-            del self.events[self.events.index(note)]
-            for event in note.midi_events:
+    def deleteNote(self, noteEvent):
+        if noteEvent in self.events:
+            self.events.remove(noteEvent)
+            for event in noteEvent.midiEvents:
                 self.track.remove(event)
 
     def deleteAllOneTimeEvents(self):
         for event in self.events:
-            for e in event.midi_events:
+            for e in event.midiEvents:
                 self.track.remove(e)
         self.events = []
 
@@ -91,12 +99,11 @@ class ConnectionTrack(MetaEventListener):
         if metaMessage.getType() == END_OF_TRACK:
             self.deleteAllOneTimeEvents()
 
-            for event in list(self.queue):
+            for event in self.queue[:]:
                 event.offset -= self.track.ticks()
                 if event.offset < self.track.ticks():
                     self.addEvent(event)
                     self.queue.remove(event)
-
 
 class Speaker(MetaEventListener):
 
@@ -133,9 +140,9 @@ class Speaker(MetaEventListener):
 
 player = Speaker()
 connect1 = player.newConnection()
-connect2 = player.newConnection()
+#connect2 = player.newConnection()
 
-offset = 64
+offset = 48
 note = Note(60,0,16)
 sm = ShortMessage(ShortMessage.PROGRAM_CHANGE, 1, note.instrument, 0)
 instrumentChange = MidiEvent(sm, offset)
@@ -147,4 +154,3 @@ noteOff = MidiEvent(sm, offset + note.duration)
 connect1.track.add(instrumentChange)
 connect1.track.add(noteOn)
 connect1.track.add(noteOff)
-
