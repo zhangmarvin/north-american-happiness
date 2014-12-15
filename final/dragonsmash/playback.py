@@ -9,6 +9,7 @@ class Note(object):
         self.duration = duration
         self.velocity = velocity
 
+
 class SingleNoteEvent(object):
     def __init__(self, note, offset):
         self.note = note
@@ -53,10 +54,8 @@ class LoopedNoteEvent(object):
         self.offset = (start + self.period) - trackLength
 
 
-
 class ConnectionTrack(MetaEventListener):
     dummyMessage = MetaMessage(42, None, 0)
-
     def __init__(self, track, measureLength):
         self.track = track
         self.measureLength = measureLength
@@ -104,7 +103,6 @@ class ConnectionTrack(MetaEventListener):
             for event in noteEvent.midiEvents:
                 self.track.remove(event)
 
-
     def deleteAllEvents(self):
         for event in self.singleEvents:
             for e in event.midiEvents:
@@ -139,7 +137,6 @@ class ConnectionTrack(MetaEventListener):
 
 
 class Speaker(MetaEventListener):
-
     def __init__(self, ppq, measureLength):
         self.sequencer = MidiSystem.getSequencer()
         self.sequence = Sequence(Sequence.PPQ, ppq)
@@ -172,7 +169,8 @@ class Speaker(MetaEventListener):
         self.sequencer.close()
         self.sequencer.setSequence(self.sequence)
 
-s = Speaker(16, 64)
-c1 = s.newConnection()
-c2 = s.newConnection()
 
+if __name__ == '__main__':
+    s = Speaker(16, 64)
+    c1 = s.newConnection()
+    c2 = s.newConnection()
