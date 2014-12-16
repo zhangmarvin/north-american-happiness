@@ -160,10 +160,15 @@ class Speaker(MetaEventListener):
                 self.sequencer.start()
 
     def newConnection(self):
-        cTrack = ConnectionTrack(self.sequence.createTrack(), self.measureLength)
-        self.sequencer.addMetaEventListener(cTrack)
-        self.connections.append(cTrack)
-        return cTrack
+        connectionTrack = ConnectionTrack(self.sequence.createTrack(), self.measureLength)
+        self.sequencer.addMetaEventListener(connectionTrack)
+        self.connections.append(connectionTrack)
+        return connectionTrack
+
+    def deleteConnection(self, connectionTrack):
+        self.sequencer.removeMetaEventListener(connectionTrack)
+        self.connections.remove(connectionTrack)
+        self.sequence.deleteTrack(connectionTrack.track)
 
     def playAll(self):
         self.playing = True
