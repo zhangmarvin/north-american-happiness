@@ -25,10 +25,10 @@ class Note(object):
 
     def __init__(self, frequency, instrument, duration, velocity, offset):
         self.frequency = frequency if type(frequency) is int else note_to_num[frequency]
-        self.instrument = instrument if type(frequency) is int else instrument_to_num[instrument]
-        self.duration = duration * 16
+        self.instrument = instrument if type(instrument) is int else instrument_to_num[instrument]
+        self.duration = int(duration * 16)
         self.velocity = velocity
-        self.offset = offset * 16
+        self.offset = int(offset * 16)
 
 
 def noteFactoryFactory(instrument):
@@ -75,7 +75,7 @@ class Player(object):
         return NoteEvent([noteHash], self)
 
     def loop(self, note, period):
-        noteHash = self._loop(note)
+        noteHash = self._loop(note, period)
         return NoteEvent([noteHash], self)
 
     def call(self, func, *args):
@@ -110,7 +110,7 @@ class Player(object):
     def scale(self, root, differences, loop=True):
         noteHashes = []
         tonic, start = root.frequency, root.offset
-        period = (root.duration * (differences + 1)) // 16
+        period = (root.duration * (len(differences) + 1)) // 16
         if loop:
             noteHashes.append(self._loop(root, period))
         else:
