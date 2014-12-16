@@ -1,5 +1,5 @@
-import ds
-from ds.client import *
+from ds import *
+from ds.instruments import AcousticGuitar, Piano, Saxophone
 
 class FilteredPlayer(Player):
     def __init__(self, original, predicate):
@@ -7,14 +7,14 @@ class FilteredPlayer(Player):
         self.original = original
         self.predicate = predicate
 
-    def _play(self, note):
+    def play(self, note):
         if self.predicate(note):
-            return self.original._play(note)
+            return self.original.play(note)
         return 0
 
-    def _loop(self, note, period):
+    def loop(self, note, period):
         if self.predicate(note):
-            return self.original._loop(note, period)
+            return self.original.loop(note, period)
         return 0
 
 
@@ -24,9 +24,10 @@ isOddNote = lambda n: not isEvenNote(n)
 def filterNote(player, func, predicate, *args, **kwargs):
     return FilteredPlayer(player, predicate).call(func, *args, **kwargs)
 
-player = ds.connect()
-
-root = Piano(60, 0.5, 127, 0)
+root = AcousticGuitar(60, 0.5, 127, 0)
+third = Piano(64, 0.5, 127, 0)
+fifth = Saxophone(67, 0.5, 127, 0)
+beat = Note(60, 127, 0.5, 127, 0)
 
 def playEvens():
     return player.call(filterNote, Player.majorScale, isEvenNote, root)
@@ -34,7 +35,14 @@ def playEvens():
 def playOdds():
     return player.call(filterNote, Player.majorScale, isOddNote, root)
 
+def playThird():
+    return player.majorScale(third)
+
+def playFifth():
+    return player.majorScale(fifth)
+
+def playBeat():
+    return player.majorScale(beat)
+
 if __name__ == '__main__':
-    e = playEvens()
-    import time; time.sleep(5)
-    o = playOdds()
+    player = connect()

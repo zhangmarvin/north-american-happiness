@@ -40,3 +40,6 @@ def tdfw_alt(player, volume=127):
     for note in alt_mel:
         notes.append(player.loop(note, 4))
     return notes
+
+if __name__ == '__main__':
+    player = connect()
