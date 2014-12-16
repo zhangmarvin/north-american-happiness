@@ -31,22 +31,6 @@ class Note(object):
         self.offset = int(offset * 16)
 
 
-def noteFactoryFactory(instrument):
-    def instrumentNoteFactory(frequency, duration, velocity, offset):
-        return Note(frequency, instrument, duration, velocity, offset)
-    return instrumentNoteFactory
-
-
-Piano = noteFactoryFactory('Acoustic Grand')
-Keyboard = noteFactoryFactory('Electric Piano 1')
-AcousticGuitar = noteFactoryFactory('Steel String Guitar')
-ElectricGuitar = noteFactoryFactory('Electric Clean Guitar')
-Bass = noteFactoryFactory('Electric Bass(finger)')
-Violin = noteFactoryFactory('Violin')
-Trumpet = noteFactoryFactory('Trumpet')
-Saxophone = noteFactoryFactory('Alto Sax')
-
-
 class NoteEvent(object):
 
     def __init__(self, noteHashes, player):
@@ -70,6 +54,12 @@ class Player(object):
     def _loop(self, note, period):
         return self.connection.sendMessage(Message(Message.ADD_LOOPED_NOTE, LoopedNote(note, period)))
 
+    def _stop(self, note):
+        if isinstance(note, NoteEvent):
+            note.kill()
+        else:
+            self.connection.sendMessage(Message(Message.DELETE_NOTE, note))
+
     def play(self, note):
         noteHash = self._play(note)
         return NoteEvent([noteHash], self)
@@ -78,28 +68,35 @@ class Player(object):
         noteHash = self._loop(note, period)
         return NoteEvent([noteHash], self)
 
-    def call(self, func, *args):
-        return func(self, *args)
+    def call(self, func, *args, **kwargs):
+        return func(self, *args, **kwargs)
+
+    def stop(self, notes):
+        if isinstance(notes, list):
+            for note in notes:
+                self._stop(note)
+        else:
+            self._stop(note)
 
     def stopAll(self):
         self.connection.sendMessage(Message(Message.DELETE_ALL_NOTES))
 
     def chord(self, root, differences, loop=True):
-        noteHashes = []
+        notes = []
         tonic = root.frequency
         period = (root.duration * 2) // 16
         if loop:
-            noteHashes.append(self._loop(root, period))
+            notes.append(self.loop(root, period))
         else:
-            noteHashes.append(self._play(root))
+            notes.append(self.play(root))
         for diff in differences:
             root.frequency += diff
             if loop:
-                noteHashes.append(self._loop(root, period))
+                notes.append(self.loop(root, period))
             else:
-                noteHashes.append(self._play(root))
+                notes.append(self.play(root))
         root.frequency = tonic
-        return NoteEvent(noteHashes, self)
+        return notes
 
     def majorChord(self, root, loop=True):
         return self.chord(root, [4, 3], loop)
@@ -108,22 +105,22 @@ class Player(object):
         return self.chord(root, [3, 4], loop)
 
     def scale(self, root, differences, loop=True):
-        noteHashes = []
+        notes = []
         tonic, start = root.frequency, root.offset
         period = (root.duration * (len(differences) + 1)) // 16
         if loop:
-            noteHashes.append(self._loop(root, period))
+            notes.append(self.loop(root, period))
         else:
-            noteHashes.append(self._play(root))
+            notes.append(self.play(root))
         for diff in differences:
             root.frequency += diff
             root.offset += root.duration
             if loop:
-                noteHashes.append(self._loop(root, period))
+                notes.append(self.loop(root, period))
             else:
-                noteHashes.append(self._play(root))
+                notes.append(self.play(root))
         root.frequency, root.offset = tonic, start
-        return NoteEvent(noteHashes, self)
+        return notes
 
     def majorScale(self, root, loop=True):
         return self.scale(root, [2, 2, 1, 2, 2, 2, 1], loop)

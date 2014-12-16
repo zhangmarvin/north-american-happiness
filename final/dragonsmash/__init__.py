@@ -1,9 +1,7 @@
-from playback import Note, Speaker
 from clientNetwork import Connection
 from serverNetwork import Server
-from client import Player
-
-import util
+from client import *
+import instruments
 
 def listen(addr='localhost', port=1640):
     """Starts up a dragonsmash server, which listens at port PORT."""
@@ -19,6 +17,7 @@ def connect(addr='192.168.1.3', port=1640):
 __all__ = [
     'listen', # server-side
     'connect', # client-side
-    'Note', 'Speaker',
-    'util'
+    'Note',
+    'Player',
+    'instruments',
 ]
