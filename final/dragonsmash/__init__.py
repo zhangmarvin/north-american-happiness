@@ -1,6 +1,6 @@
 from clientNetwork import Connection
 from serverNetwork import Server
-from client import *
+from client import Note, Player
 import instruments
 
 def listen(addr='localhost', port=1640):
