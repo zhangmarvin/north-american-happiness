@@ -108,6 +108,12 @@ class ConnectionTrack(MetaEventListener):
             self.loopedEvents.remove(noteEvent)
             for event in noteEvent.midiEvents:
                 self.track.remove(event)
+        elif noteEvent in self.queue:
+            self.queue.remove(noteEvent)
+
+    def deleteAllNotes(self):
+        self.deleteAllEvents()
+        self.queue = []
 
     def deleteAllEvents(self):
         for event in self.singleEvents:

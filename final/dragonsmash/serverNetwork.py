@@ -10,6 +10,7 @@ class Server(object):
         self.port = port
         self._listener = ServerSocket(self.port)
         self.speaker = Speaker()
+        self.speaker.playAll()
 
     def listen(self):
         while True:
