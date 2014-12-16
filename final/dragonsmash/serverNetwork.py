@@ -26,6 +26,7 @@ class Server(object):
     def deleteConnection(self, connectionTrack):
         self.speaker.deleteConnection(connectionTrack)
 
+
 class ClientConnection(object):
     def __init__(self, server, socket, connectionTrack):
         self.server = server
@@ -85,6 +86,7 @@ class ClientConnection(object):
 
     def __str__(self):
         return str(self.socket.getInetAddress()).split('/')[-1]
+
 
 if __name__ == '__main__':
     s = Server(1640)
