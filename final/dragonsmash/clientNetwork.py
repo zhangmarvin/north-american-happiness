@@ -19,7 +19,7 @@ class Connection(object):
 
 if __name__ == '__main__':
     from client import *
-    me = Connection('localhost', 1640)
+    me = Connection('192.168.1.3', 1640)
 
     def t(tone=60, offset=0, period=64):
         me.sendMessage(Message(Message.ADD_LOOPED_NOTE, LoopedNote(tone, 0, 16, 127, offset, period)))

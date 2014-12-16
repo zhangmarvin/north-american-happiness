@@ -27,12 +27,13 @@ class Message(object):
         if msgType == Message.ACK:
             return Ack(*args)
         elif msgType == Message.ADD_NOTE:
-            args = map(int, args)
+            args = tuple(map(int, args))
             return Message(msgType, (Note(*args[:-1]), args[-1]))
         elif msgType == Message.ADD_LOOPED_NOTE:
-            args = map(int, args)
+            args = tuple(map(int, args))
             return Message(msgType, (Note(*args[:-2]), args[-2], args[-1]))
         elif msgType == Message.DELETE_NOTE:
+            args = tuple(map(int, args))
             return Message(msgType, args)
         elif msgType == Message.DELETE_ALL_NOTES:
             return Message(msgType, ())

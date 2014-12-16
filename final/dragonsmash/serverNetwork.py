@@ -12,6 +12,7 @@ class Server(object):
         self._listener = ServerSocket(self.port)
         self.speaker = Speaker()
         self.speaker.playAll()
+        self.connections = []
 
     def listen(self):
         while True:
@@ -19,6 +20,7 @@ class Server(object):
                                              self._listener.accept(),
                                              self.speaker.newConnection())
             print 'New connection accepted!', newConnection
+            self.connections.append(newConnection)
             Thread(target=newConnection.handle).start()
 
     def deleteConnection(self, connectionTrack):
@@ -72,7 +74,7 @@ class ClientConnection(object):
             msgData = msg.msgData
             handle = self.handlers[msgType](msgData)
 
-            print msg
+            print data, '->', msg
             ack = Ack(handle)
             self.out.println(str(ack))
 
