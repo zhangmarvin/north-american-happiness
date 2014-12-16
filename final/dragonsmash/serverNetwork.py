@@ -3,6 +3,7 @@ from java.io import BufferedReader, InputStreamReader, PrintWriter
 
 from threading import Thread
 
+from utilNetwork import Message, Ack
 from playback import Speaker, Note
 
 class Server(object):
@@ -28,10 +29,36 @@ class ClientConnection(object):
         self.server = server
         self.connectionTrack = connectionTrack
         self.kill = False
+        self.notes = {}
 
         self.socket = socket
         self.in = BufferedReader(InputStreamReader(self.socket.getInputStream()))
         self.out = PrintWriter(self.socket.getOutputStream(), True)
+
+        self.handlers = {
+            Message.ADD_NOTE: self._addNote,
+            Message.ADD_LOOPED_NOTE: self._addLoopedNote,
+            Message.DELETE_NOTE: self._deleteNote,
+            Message.DELETE_ALL_NOTES: self._deleteAllNotes
+        }
+
+    def _addNote(self, args):
+        result = self.connectionTrack.addNote(*args)
+        key = hash(result)
+        self.notes[key] = result
+        return key
+
+    def _addLoopedNote(self, args):
+        result = self.connectionTrack.addLoopedNote(*args)
+        key = hash(result)
+        self.notes[key] = result
+        return key
+
+    def _deleteNote(self, args):
+        self.connectionTrack.deleteNote(self.notes[args[0]])
+
+    def _deleteAllNotes(self, args):
+        self.connectionTrack.deleteAllNotes()
 
     def handle(self):
         while not self.kill and not self.socket.isClosed():
@@ -40,9 +67,15 @@ class ClientConnection(object):
                 self.kill = True
                 break
 
-            # TODO actually do things with data
-            print data
-            self.out.println('ACK')
+            msg = Message.decode(data)
+            msgType = msg.msgType
+            msgData = msg.msgData
+            handle = self.handlers[msgType](msgData)
+
+            print msg
+            ack = Ack(handle)
+            self.out.println(str(ack))
+
         # clean up
         self.connectionTrack.deleteAllEvents()
         self.server.deleteConnection(self.connectionTrack)
@@ -53,4 +86,4 @@ class ClientConnection(object):
 
 if __name__ == '__main__':
     s = Server(1640)
-    s.listen()
+    Thread(target=s.listen).start()

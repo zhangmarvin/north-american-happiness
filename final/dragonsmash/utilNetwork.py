@@ -7,23 +7,22 @@ class Message(object):
     DELETE_ALL_NOTES = 'DAN'
     ACK = 'ACK'
 
-    def __init__(self, msgType, data):
+    def __init__(self, msgType, msgData):
         self.msgType = msgType
-        self.data = data
+        self.msgData = msgData
 
     def __str__(self):
-        return self.msgType + ':' + str(self.data)
+        return self.msgType + ':' + str(self.msgData)
 
     def __eq__(self, other):
         if not isinstance(other, Message):
             return False
-        return self.msgType == other.msgType and self.data == other.data
+        return self.msgType == other.msgType and self.msgData == other.msgData
 
     @staticmethod
     def decode(message):
-        msgType, data = message.split(':')
-        if data:
-            args = data.split(',')
+        msgType, msgData = message.split(':')
+        args = msgData.split(',')
 
         if msgType == Message.ACK:
             return Ack(*args)
@@ -39,8 +38,10 @@ class Message(object):
             return Message(msgType, ())
 
 class Ack(Message):
-    def __init__(self, data=''):
-        Message.__init__(self, Message.ACK, data)
+    def __init__(self, msgData=''):
+        if msgData is None:
+            msgData = ''
+        Message.__init__(self, Message.ACK, msgData)
 
 if __name__ == '__main__':
     from client import SingleNote, LoopedNote

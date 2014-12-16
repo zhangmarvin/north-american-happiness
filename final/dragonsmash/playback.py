@@ -162,6 +162,8 @@ class Speaker(MetaEventListener):
     def meta(self, meta):
         if meta.getType() == END_OF_TRACK:
             if self.playing:
+                self.sequencer.stop()
+                self.sequencer.setSequence(self.sequence)
                 self.sequencer.setTickPosition(0)
                 self.sequencer.start()
 
