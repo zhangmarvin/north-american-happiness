@@ -58,7 +58,11 @@ class ClientConnection(object):
         return key
 
     def _deleteNote(self, args):
-        self.connectionTrack.deleteNote(self.notes[args[0]])
+        note = self.notes.get(args[0])
+        if note is not None:
+            self.connectionTrack.deleteNote(note)
+        else:
+            print 'Unknown note hash:', args[0]
 
     def _deleteAllNotes(self, args):
         self.connectionTrack.deleteAllNotes()
