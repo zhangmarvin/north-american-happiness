@@ -24,7 +24,7 @@ class LoopedNote(SingleNote):
 class Note(object):
 
     def __init__(self, frequency, instrument, duration, velocity, offset):
-        self.frequency = frequency if type(frequency) is int else note_to_num[frequency]
+        self.frequency = frequency if type(frequency) is int else note_to_num[frequency.upper()]
         self.instrument = instrument if type(instrument) is int else instrument_to_num[instrument]
         self.duration = int(duration * 16)
         self.velocity = velocity
