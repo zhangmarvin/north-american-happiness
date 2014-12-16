@@ -11,6 +11,9 @@ class SingleNote(object):
     def __str__(self):
         return ','.join(map(str, self._attrs))
 
+    def __eq__(self, other):
+        return isinstance(other, SingleNote) and self._attrs == other._attrs
+
 class LoopedNote(SingleNote):
     def __init__(self, frequency, instrument, duration, velocity, offset, period):
         SingleNote.__init__(self, frequency, instrument, duration, velocity, offset)
