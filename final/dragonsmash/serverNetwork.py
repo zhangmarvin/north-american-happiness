@@ -40,8 +40,10 @@ class ClientConnection(object):
                 break
 
             # TODO actually do things with data
+            print data
+            self.out.println('ACK')
         # clean up
-        self.connectionTrack.deleteAll()
+        self.connectionTrack.deleteAllEvents()
         self.server.deleteConnection(self.connectionTrack)
         self.socket.close()
 
