@@ -7,7 +7,7 @@ class Message(object):
     DELETE_ALL_NOTES = 'DAN'
     ACK = 'ACK'
 
-    def __init__(self, msgType, msgData):
+    def __init__(self, msgType, msgData=''):
         self.msgType = msgType
         self.msgData = msgData
 
@@ -39,7 +39,7 @@ class Message(object):
             return Message(msgType, ())
 
 class Ack(Message):
-    def __init__(self, msgData=''):
+    def __init__(self, msgData=None):
         if msgData is None:
             msgData = ''
         Message.__init__(self, Message.ACK, msgData)
