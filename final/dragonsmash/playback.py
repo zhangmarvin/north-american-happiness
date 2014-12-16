@@ -144,7 +144,7 @@ class ConnectionTrack(MetaEventListener):
 
 class Speaker(MetaEventListener):
 
-    def __init__(self, ppq, measureLength):
+    def __init__(self, ppq=16, measureLength=64):
         self.sequencer = MidiSystem.getSequencer()
         self.sequence = Sequence(Sequence.PPQ, ppq)
         self.sequencer.setSequence(self.sequence)
@@ -183,7 +183,7 @@ class Speaker(MetaEventListener):
 
 
 if __name__ == '__main__':
-    s = Speaker(16, 64)
+    s = Speaker()
     c1 = s.newConnection()
     c2 = s.newConnection()
 
