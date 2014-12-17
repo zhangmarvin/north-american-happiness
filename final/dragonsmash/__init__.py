@@ -9,7 +9,7 @@ def listen(addr='localhost', port=1640):
     s = Server(port)
     s.listen()
 
-def connect(addr='192.168.1.3', port=1640):
+def connect(addr='localhost', port=1640):
     """Connects to an existing dragonsmash server at (addr, port)."""
     print 'Connecting to', (addr, port)
     return Player(Connection(addr, port))

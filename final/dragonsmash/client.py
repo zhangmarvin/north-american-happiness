@@ -76,7 +76,7 @@ class Player(object):
             for note in notes:
                 self._stop(note)
         else:
-            self._stop(note)
+            self._stop(notes)
 
     def stopAll(self):
         self.connection.sendMessage(Message(Message.DELETE_ALL_NOTES))
